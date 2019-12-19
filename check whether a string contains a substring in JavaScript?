@@ -1,0 +1,13 @@
+var string = "foo",
+    substring = "oo";
+
+console.log(string.includes(substring));
+
+bao gồm không có hỗ trợ Internet Explorer.
+Trong môi trường ECMAScript 5 trở lên, 
+hãy sử dụng String.prototype.indexOf, 
+trả về -1 khi một chuỗi con không thể là danh từ
+var string = "foo",
+    substring = "oo";
+
+console.log(string.indexOf(substring) !== -1);
