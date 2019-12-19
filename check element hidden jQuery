@@ -1,0 +1,7 @@
+https://stackoverflow.com/questions/178325/how-do-i-check-if-an-element-is-hidden-in-jquery
+
+// Checks css for display:[none|block], ignores visibility:[true|false]
+$(element).is(":visible");  works for jQuery 1.4.4, but not for jQuery 1.3.2
+
+// The same works with hidden
+$(element).is(":hidden"); 
