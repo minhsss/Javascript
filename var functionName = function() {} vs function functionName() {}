@@ -1,0 +1,120 @@
+https://stackoverflow.com/questions/336859/var-functionname-function-vs-function-functionname
+
+a function expression:
+
+// TypeError: functionOne is not a function
+functionOne();
+
+var functionOne = function() {
+  console.log("Hello!");
+};
+
+a function declaration:
+
+// Outputs: "Hello!"
+functionTwo();
+
+function functionTwo() {
+  console.log("Hello!");
+}
+ 
+ 
+ 
+ First I want to correct Greg: function abc(){} is scoped too — the name abc is defined in the scope where this definition is encountered. Example:
+
+function xyz(){
+  function abc(){};
+  // abc is defined here...
+}
+// ...but not here
+Secondly, it is possible to combine both styles:
+
+var xyz = function abc(){};
+xyz is going to be defined as usual, abc is undefined in all browsers but Internet Explorer — do not rely on it being defined. But it will be defined inside its body:
+
+var xyz = function abc(){
+  // xyz is visible here
+  // abc is visible here
+}
+// xyz is visible here
+// abc is undefined here
+If you want to alias functions on all browsers, use this kind of declaration:
+
+function abc(){};
+var xyz = abc;
+In this case, both xyz and abc are aliases of the same object:
+
+console.log(xyz === abc); // prints "true"
+One compelling reason to use the combined style is the "name" attribute of function objects (not supported by Internet Explorer). Basically when you define a function like
+
+function abc(){};
+console.log(abc.name); // prints "abc"
+its name is automatically assigned. But when you define it like
+
+var abc = function(){};
+console.log(abc.name); // prints ""
+its name is empty — we created an anonymous function and assigned it to some variable.
+
+Another good reason to use the combined style is to use a short internal name to refer to itself, while providing a long non-conflicting name for external users:
+
+// Assume really.long.external.scoped is {}
+really.long.external.scoped.name = function shortcut(n){
+  // Let it call itself recursively:
+  shortcut(n - 1);
+  // ...
+  // Let it pass itself as a callback:
+  someFunction(shortcut);
+  // ...
+}
+In the example above we can do the same with an external name, but it'll be too unwieldy (and slower).
+
+(Another way to refer to itself is to use arguments.callee, which is still relatively long, and not supported in the strict mode.)
+
+Deep down, JavaScript treats both statements differently. This is a function declaration:
+
+function abc(){}
+abc here is defined everywhere in the current scope:
+
+// We can call it here
+abc(); // Works
+
+// Yet, it is defined down there.
+function abc(){}
+
+// We can call it again
+abc(); // Works
+Also, it hoisted through a return statement:
+
+// We can call it here
+abc(); // Works
+return;
+function abc(){}
+This is a function expression:
+
+var xyz = function(){};
+xyz here is defined from the point of assignment:
+
+// We can't call it here
+xyz(); // UNDEFINED!!!
+
+// Now it is defined
+xyz = function(){}
+
+// We can call it here
+xyz(); // works
+Function declaration vs. function expression is the real reason why there is a difference demonstrated by Greg.
+
+Fun fact:
+
+var xyz = function abc(){};
+console.log(xyz.name); // Prints "abc"
+Personally, I prefer the "function expression" declaration because this way I can control the visibility. When I define the function like
+
+var abc = function(){};
+I know that I defined the function locally. When I define the function like
+
+abc = function(){};
+I know that I defined it globally providing that I didn't define abc anywhere in the chain of scopes. This style of definition is resilient even when used inside eval(). While the definition
+
+function abc(){};
+depends on the context and may leave you guessing where it is actually defined, especially in the case of eval() — the answer is: It depends on the browser.
